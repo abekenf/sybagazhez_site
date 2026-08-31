@@ -60,9 +60,31 @@
 
   /* ═══════════ 2. ШАПКА, НАВИГАЦИЯ, МОБИЛЬНОЕ МЕНЮ ═══════════ */
   var hdr = $('#hdr');
-  var onScroll = function () { hdr.classList.toggle('is-stuck', window.scrollY > 20); };
+
+  /* Кнопки прокрутки: «наверх» — когда ушли ниже экрана,
+     «вниз» — пока до конца страницы ещё далеко. */
+  var snavUp = $('#snavUp'), snavDown = $('#snavDown');
+
+  var onScroll = function () {
+    var y = window.scrollY, vh = window.innerHeight;
+    hdr.classList.toggle('is-stuck', y > 20);
+
+    if (!snavUp || !snavDown) return;
+    var passedHero = y > vh * 0.6;
+    var toBottom = document.documentElement.scrollHeight - (y + vh);
+    snavUp.classList.toggle('is-on', passedHero);
+    snavDown.classList.toggle('is-on', passedHero && toBottom > 120);
+  };
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
   onScroll();
+
+  if (snavUp) snavUp.addEventListener('click', function () {
+    window.scrollTo({ top: 0 });                                     // плавность берётся из CSS
+  });
+  if (snavDown) snavDown.addEventListener('click', function () {
+    window.scrollTo({ top: document.documentElement.scrollHeight });
+  });
 
   var burger = $('#burger'), mnav = $('#mnav');
   function closeMnav() {
